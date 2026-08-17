@@ -1,0 +1,9 @@
+.git
+.github
+.impeccable
+.svelte-kit
+build
+iains-notes
+node_modules
+*.md
+tests
