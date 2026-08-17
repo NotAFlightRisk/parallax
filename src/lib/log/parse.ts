@@ -87,12 +87,14 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
   let total = 0;
   let unmatched = 0;
   let orphanStart = -1;
+  let blanks = 0;
   let cursor = 0;
   let nextTick = 0;
 
   while (cursor < text.length) {
     const end = lineEndAt(text, cursor);
     if (end === cursor) {
+      if (count > 0) blanks += 1;
       cursor = end + 1;
       continue;
     }
@@ -103,11 +105,13 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
       unmatched += 1;
       if (count > 0) {
         ends[count - 1] = end;
-        lines[count - 1] += 1;
+        lines[count - 1] += blanks + 1;
+        blanks = 0;
       } else if (orphanStart === -1) {
         orphanStart = cursor;
       }
     } else {
+      blanks = 0;
       let time: number;
       if ('epoch' in stamp) {
         time = stamp.epoch;
