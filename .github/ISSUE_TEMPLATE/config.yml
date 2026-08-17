@@ -11,7 +11,7 @@ contact_links:
     about: Never report vulnerabilities in a public issue. Read our security policy and disclose privately.
 
   - name: 📖 Documentation
-    url: https://project.peng.ly/
+    url: https://github.com/NotAFlightRisk/parallax/blob/main/.github/README.md
     about: Usage, configuration and deployment docs. Worth checking before filing.
 
   - name: 🙋 Support & Troubleshooting

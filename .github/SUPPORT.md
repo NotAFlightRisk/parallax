@@ -4,7 +4,7 @@ Need a hand? Here's where to go 👇
 
 ## Before you ask
 
-Have a look at the [README](./README.md), especially [Deployment](./README.md#deployment) and [Development](./README.md#development). Then search [existing issues](https://github.com/NotAFlightRisk/parallax/issues?q=is%3Aissue), because someone's likley hit the same thing.
+Have a look at the [README](./README.md), especially [Deployment](./README.md#deployment) and [Development](./README.md#development). Then search [existing issues](https://github.com/NotAFlightRisk/parallax/issues?q=is%3Aissue), because someone's likely hit the same thing.
 
 ---
 
