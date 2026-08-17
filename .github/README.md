@@ -1,17 +1,13 @@
-<h1 align="center">Parallax 🔭</h1>
+<h1 align="center">Parallax 🪵</h1>
 <p align="center">
-<i>Merge logs from several machines, and line up their clocks</i>
+<i>Log aligner, to merge/compare logs from different sources</i>
 <br />
 <b>🌐 <a href="https://parallax.peng.ly/">parallax.peng.ly</a></b><br />
 </p>
 
-## About
-
-Drop in up to six logs, read them as one timeline, and nudge the ones whose clock drifted.
-
 <p align="center">
   <a href="https://parallax.peng.ly/">
-    <img src="https://pixelflare.cc/iain/screenshots/parallax" width="700" />
+    <img src="https://pixelflare.cc/iain/screenshots/parallax" width="900" />
   </a>
 </p>
 
