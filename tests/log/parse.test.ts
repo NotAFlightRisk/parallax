@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '../../src/lib/log/parse';
+import { lineText } from '../../src/lib/log/lines';
 import { detect, epochFrom } from '../../src/lib/log/formats';
 import type { ParseOptions } from '../../src/lib/log/types';
 
@@ -76,6 +77,24 @@ describe('parsing', () => {
     expect(parsed.times).toHaveLength(2);
     expect(parsed.lines[0]).toBe(3);
     expect(parsed.text.slice(parsed.starts[0], parsed.ends[0])).toContain('at other');
+  });
+
+  it('keeps a blank line that falls inside an entry', () => {
+    const text = [
+      '2026-08-17T00:00:00Z boom',
+      'Traceback (most recent call last):',
+      '',
+      '  at other (b.js:2)',
+      '2026-08-17T00:00:01Z next'
+    ].join('\n');
+    const parsed = run(text);
+    expect(parsed.lines[0]).toBe(4);
+    expect(lineText(parsed, 0, 3)).toBe('  at other (b.js:2)');
+  });
+
+  it('drops a blank line sitting between two entries', () => {
+    const parsed = run('2026-08-17T00:00:00Z up\n\n2026-08-17T00:00:01Z next');
+    expect(parsed.lines[0]).toBe(1);
   });
 
   it('keeps a header that arrives before the first timestamp', () => {
