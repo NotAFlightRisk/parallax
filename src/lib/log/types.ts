@@ -29,6 +29,9 @@ export type Parsed = {
   detected: boolean;
   total: number;
   unmatched: number;
+  /** True extremes, since a source may hold a few out-of-order lines */
+  low: number;
+  high: number;
 };
 
 export type Source = {
@@ -46,11 +49,15 @@ export type Source = {
 
 export type WorkerRequest = {
   id: string;
+  run: number;
   text: string;
   options: ParseOptions;
 };
 
+/** The text stays on the main thread, so only the typed arrays travel back */
+export type ParsedBody = Omit<Parsed, 'text'>;
+
 export type WorkerResponse =
   | { id: string; kind: 'progress'; done: number; total: number }
-  | { id: string; kind: 'done'; parsed: Parsed }
+  | { id: string; kind: 'done'; parsed: ParsedBody }
   | { id: string; kind: 'error'; message: string };

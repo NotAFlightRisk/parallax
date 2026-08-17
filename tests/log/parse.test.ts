@@ -101,6 +101,17 @@ describe('parsing', () => {
     expect(new Date(parsed.times[0]).getUTCFullYear()).toBe(2025);
   });
 
+  it('honours an hour-only ISO offset', () => {
+    const parsed = run('2026-08-17T01:00:00+01 up');
+    expect(parsed.times[0]).toBe(Date.UTC(2026, 7, 17, 0, 0, 0));
+  });
+
+  it('records the true extremes even when lines arrive out of order', () => {
+    const parsed = run('2026-08-17T00:00:09Z late\n2026-08-17T00:00:01Z early');
+    expect(parsed.low).toBe(Date.UTC(2026, 7, 17, 0, 0, 1));
+    expect(parsed.high).toBe(Date.UTC(2026, 7, 17, 0, 0, 9));
+  });
+
   it('rolls the year forward when a yearless log crosses new year', () => {
     const parsed = run('Dec 31 23:59:59 host a[1]: x\nJan 01 00:00:01 host a[1]: y');
     const years = Array.from(parsed.times, (time) => new Date(time).getUTCFullYear());
@@ -111,6 +122,20 @@ describe('parsing', () => {
     const parsed = run('Aug 17 00:00:05 host a[1]: x\nAug 17 00:00:01 host a[1]: y');
     const years = Array.from(parsed.times, (time) => new Date(time).getUTCFullYear());
     expect(years).toEqual([2026, 2026]);
+  });
+
+  it('does not roll the year for a mid-year jump backwards', () => {
+    const parsed = run('Aug 17 00:00:00 host a[1]: x\nJun 01 00:00:00 host a[1]: y');
+    const years = Array.from(parsed.times, (time) => new Date(time).getUTCFullYear());
+    expect(years).toEqual([2026, 2026]);
+  });
+
+  it('infers the year in the source zone, not in UTC', () => {
+    const newYear = Date.UTC(2026, 11, 31, 23, 30);
+    const parsed = parse('Jan 01 13:30:00 host a[1]: hi', options({ zone: 'Pacific/Kiritimati' }), {
+      now: newYear
+    });
+    expect(parsed.times[0]).toBe(newYear);
   });
 
   it('reads a custom regex through its named groups', () => {

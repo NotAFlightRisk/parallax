@@ -9,6 +9,7 @@ import {
   sourceOf
 } from '../../src/lib/log/merge';
 import { matchMask } from '../../src/lib/log/search';
+import { spanOf } from '../../src/lib/log/merge';
 import { render } from '../../src/lib/log/render';
 import type { Lane } from '../../src/lib/log/merge';
 
@@ -108,8 +109,28 @@ describe('free text search', () => {
   });
 
   it('marks only the entries holding the term', () => {
-    const mask = matchMask(parsed.text.toLowerCase(), 'alpha', parsed.starts, parsed.ends);
+    const mask = matchMask(parsed.text, 'alpha', parsed.starts, parsed.ends);
     expect(Array.from(mask)).toEqual([1, 0, 1]);
+  });
+
+  it('ignores case without lowercasing the text out from under the offsets', () => {
+    const mask = matchMask(parsed.text, 'ALPHA', parsed.starts, parsed.ends);
+    expect(Array.from(mask)).toEqual([1, 0, 1]);
+  });
+
+  it('keeps the right entry when a character lowercases to two', () => {
+    const odd = parse([iso(1, 'İstanbul'), iso(2, 'needle')].join('\n'), {
+      format: 'iso',
+      zone: 'UTC'
+    });
+    const mask = matchMask(odd.text, 'needle', odd.starts, odd.ends);
+    expect(Array.from(mask)).toEqual([0, 1]);
+  });
+
+  it('treats the term as text, not as a pattern', () => {
+    const dotted = parse([iso(1, 'a.c'), iso(2, 'abc')].join('\n'), { format: 'iso', zone: 'UTC' });
+    const mask = matchMask(dotted.text, 'a.c', dotted.starts, dotted.ends);
+    expect(Array.from(mask)).toEqual([1, 0]);
   });
 
   it('marks an entry when the term is on an attached line', () => {
@@ -117,13 +138,31 @@ describe('free text search', () => {
       format: 'iso',
       zone: 'UTC'
     });
-    const mask = matchMask(stacked.text.toLowerCase(), 'needle', stacked.starts, stacked.ends);
+    const mask = matchMask(stacked.text, 'needle', stacked.starts, stacked.ends);
     expect(Array.from(mask)).toEqual([1, 0]);
   });
 
   it('marks everything when there is no term', () => {
-    const mask = matchMask(parsed.text.toLowerCase(), '', parsed.starts, parsed.ends);
+    const mask = matchMask(parsed.text, '', parsed.starts, parsed.ends);
     expect(Array.from(mask)).toEqual([1, 1, 1]);
+  });
+});
+
+describe('span', () => {
+  it('takes the true extremes, not the first and last line', () => {
+    const lanes = [lane([iso(9, 'late'), iso(1, 'early')].join('\n'))];
+    expect(spanOf(lanes)).toEqual([Date.UTC(2026, 7, 17, 0, 0, 1), Date.UTC(2026, 7, 17, 0, 0, 9)]);
+  });
+
+  it('shifts with the offset', () => {
+    expect(spanOf([lane(iso(1, 'a'), 1000)])).toEqual([
+      Date.UTC(2026, 7, 17, 0, 0, 2),
+      Date.UTC(2026, 7, 17, 0, 0, 2)
+    ]);
+  });
+
+  it('is null with nothing loaded', () => {
+    expect(spanOf([])).toBeNull();
   });
 });
 

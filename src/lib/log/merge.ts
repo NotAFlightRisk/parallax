@@ -22,14 +22,14 @@ export type Merged = {
   span: [number, number] | null;
 };
 
-/** Each lane is sorted, so its ends are its extremes. No merge needed for this */
+/** Reads the extremes the parser recorded, so out-of-order lines still count */
 export function spanOf(lanes: Lane[]): [number, number] | null {
   let low = Infinity;
   let high = -Infinity;
   for (const { parsed, offset } of lanes) {
     if (!parsed.times.length) continue;
-    low = Math.min(low, parsed.times[0] + offset);
-    high = Math.max(high, parsed.times[parsed.times.length - 1] + offset);
+    low = Math.min(low, parsed.low + offset);
+    high = Math.max(high, parsed.high + offset);
   }
   return low === Infinity ? null : [low, high];
 }
@@ -58,6 +58,8 @@ export function merge(lanes: Lane[], range?: [number, number] | null): Merged {
   const heads = new Float64Array(width);
   let count = 0;
   let rows = 0;
+  let minTime = Infinity;
+  let maxTime = -Infinity;
 
   const advance = (lane: number) => {
     const laneTimes = allTimes[lane];
@@ -91,6 +93,8 @@ export function merge(lanes: Lane[], range?: [number, number] | null): Merged {
     const index = cursors[pick];
     order[count] = (pick << INDEX_BITS) | index;
     times[count] = best;
+    if (best < minTime) minTime = best;
+    if (best > maxTime) maxTime = best;
     rowStarts[count] = rows;
     rows += allLines[pick][index];
     count += 1;
@@ -105,7 +109,7 @@ export function merge(lanes: Lane[], range?: [number, number] | null): Merged {
     times: times.subarray(0, count),
     rowStarts: rowStarts.subarray(0, count + 1),
     rows,
-    span: count ? [times[0], times[count - 1]] : null
+    span: count ? [minTime, maxTime] : null
   };
 }
 

@@ -1,12 +1,13 @@
 import { NEEDS_YEAR, detect, readerFor, resolve, type Fields, type Format } from './formats';
 import type { FormatId, ParseOptions, Parsed } from './types';
+import { offsetAt } from './zone';
 
 /** Only the head of a line can hold a timestamp, so never slice more than this */
 const HEAD = 200;
 const SAMPLE_LINES = 200;
 const DAY = 86400000;
-/** A jump back this big is a new year, anything smaller is just out-of-order logging */
-const ROLLOVER = 30 * DAY;
+const LATE_MONTH = 11;
+const EARLY_MONTH = 2;
 
 export type ParseHooks = { onProgress?: (done: number, total: number) => void; now?: number };
 
@@ -40,10 +41,11 @@ function firstFields(heads: string[], read: Format['read']) {
 
 /**
  * Formats without a year start from the newest year that does not put the first
- * line in the future, then roll forward whenever time jumps backwards.
+ * line in the future, then roll forward at a year end. Read in the source's own
+ * zone, which near new year is not the same year as UTC.
  */
 function baseYear(first: Fields | undefined, zone: string, now: number) {
-  const year = new Date(now).getUTCFullYear();
+  const year = new Date(now + offsetAt(now, zone)).getUTCFullYear();
   if (!first) return year;
   return resolve(first, year, zone) > now + DAY ? year - 1 : year;
 }
@@ -79,6 +81,9 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
     : 0;
 
   let previous = -Infinity;
+  let previousMonth = 0;
+  let low = Infinity;
+  let high = -Infinity;
   let total = 0;
   let unmatched = 0;
   let orphanStart = -1;
@@ -108,12 +113,20 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
         time = stamp.epoch;
       } else {
         time = resolve(stamp, year, options.zone);
-        if (stamp.year === undefined && time < previous - ROLLOVER) {
+        const rolled =
+          stamp.year === undefined &&
+          time < previous &&
+          previousMonth >= LATE_MONTH &&
+          stamp.month <= EARLY_MONTH;
+        if (rolled) {
           year += 1;
           time = resolve(stamp, year, options.zone);
         }
+        previousMonth = stamp.month;
       }
       previous = time;
+      if (time < low) low = time;
+      if (time > high) high = time;
       if (count === times.length) grow();
       times[count] = time;
       starts[count] = count === 0 && orphanStart !== -1 ? orphanStart : cursor;
@@ -140,7 +153,9 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
     format,
     detected,
     total,
-    unmatched
+    unmatched,
+    low: count ? low : 0,
+    high: count ? high : 0
   };
 }
 

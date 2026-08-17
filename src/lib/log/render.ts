@@ -1,6 +1,6 @@
 import { indexOf, sourceOf, type Lane, type Merged } from './merge';
 import { lineText } from './lines';
-import { clock } from './time';
+import { clock, formatDelta } from './time';
 
 export type RenderOptions = { zone: string; names: string[]; delta: boolean };
 
@@ -29,5 +29,5 @@ export function render(lanes: Lane[], merged: Merged, options: RenderOptions) {
 }
 
 function deltaCell(delta: number) {
-  return (Number.isFinite(delta) ? `+${Math.round(delta)}ms` : '').padStart(10);
+  return formatDelta(delta).padStart(9);
 }

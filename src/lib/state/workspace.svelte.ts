@@ -12,20 +12,6 @@ const DENSITY_BUCKETS = 240;
 let counter = 0;
 const nextId = () => `s${(counter += 1)}`;
 
-/** Lowercased copy for searching, built once and kept off the reactive graph */
-const lowered = new WeakMap<Source, string>();
-
-function maskFor(source: Source, needle: string) {
-  const parsed = source.parsed;
-  if (!parsed) return undefined;
-  let lower = lowered.get(source);
-  if (lower === undefined) {
-    lower = parsed.text.toLowerCase();
-    lowered.set(source, lower);
-  }
-  return matchMask(lower, needle, parsed.starts, parsed.ends);
-}
-
 export class Workspace {
   /** Raw, because a source holds megabytes of text and typed arrays */
   sources = $state.raw<Source[]>([]);
@@ -38,12 +24,18 @@ export class Workspace {
   anchoring = $state(false);
   notice = $state('');
 
+  /** Live parse per source, so a superseded run cannot land after the one that replaced it */
+  private runs = new Map<string, { run: number; worker: Worker }>();
+  private counter = 0;
+
   lanes: Lane[] = $derived.by(() => {
     const needle = this.query.trim().toLowerCase();
     return this.visible.map((source) => ({
       parsed: source.parsed!,
       offset: source.offset,
-      mask: needle ? maskFor(source, needle) : undefined
+      mask: needle
+        ? matchMask(source.text, needle, source.parsed!.starts, source.parsed!.ends)
+        : undefined
     }));
   });
 
@@ -66,7 +58,7 @@ export class Workspace {
       id: nextId(),
       name,
       colour: PALETTE[this.sources.length % PALETTE.length],
-      text,
+      text: text.includes('\r') ? text.replace(/\r/g, '') : text,
       options: { format: 'auto', zone: this.zone, ...options },
       offset: 0,
       enabled: true,
@@ -83,6 +75,8 @@ export class Workspace {
   }
 
   remove(id: string) {
+    this.runs.get(id)?.worker.terminate();
+    this.runs.delete(id);
     this.sources = this.sources.filter((source) => source.id !== id);
     if (this.anchor?.source === id) this.anchor = null;
   }
@@ -98,26 +92,35 @@ export class Workspace {
   private parse(id: string) {
     const source = this.sources.find((entry) => entry.id === id);
     if (!source) return;
+    this.runs.get(id)?.worker.terminate();
     this.update(id, { progress: 0, error: undefined });
 
+    const run = (this.counter += 1);
     const worker = new Worker(new URL('../log/worker.ts', import.meta.url), { type: 'module' });
+    this.runs.set(id, { run, worker });
+    const current = () => this.runs.get(id)?.run === run;
+
     worker.onmessage = ({ data }: MessageEvent<WorkerResponse>) => {
+      if (!current()) return;
       if (data.kind === 'progress') {
         this.update(id, { progress: data.done / Math.max(1, data.total) });
         return;
       }
       worker.terminate();
+      this.runs.delete(id);
       if (data.kind === 'error') {
         this.update(id, { error: data.message, progress: undefined, parsed: undefined });
       } else {
-        this.update(id, { parsed: data.parsed, progress: undefined });
+        this.update(id, { parsed: { ...data.parsed, text: source.text }, progress: undefined });
       }
     };
     worker.onerror = () => {
+      if (!current()) return;
       worker.terminate();
+      this.runs.delete(id);
       this.update(id, { error: 'The parser worker could not start', progress: undefined });
     };
-    const request: WorkerRequest = { id, text: source.text, options: source.options };
+    const request: WorkerRequest = { id, run, text: source.text, options: source.options };
     worker.postMessage(request);
   }
 
@@ -160,6 +163,10 @@ export class Workspace {
       const source = this.sources[at];
       if (source) this.reparse(source.id, saved.options);
     });
-    this.notice = `Loaded settings for ${session.sources.length} sources`;
+    const applied = Math.min(session.sources.length, this.sources.length);
+    const spare = session.sources.length - applied;
+    this.notice = `Loaded settings for ${applied} of your sources${
+      spare ? `, ${spare} in the file had nothing to attach to` : ''
+    }`;
   }
 }
