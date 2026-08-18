@@ -1,3 +1,10 @@
+/** Empties the picker after taking its files, or picking the same one twice fires nothing */
+export function takeFiles(input: HTMLInputElement) {
+  const files = Array.from(input.files ?? []);
+  input.value = '';
+  return files;
+}
+
 export async function readFiles(list: FileList | File[], limit: number) {
   const files = Array.from(list).slice(0, Math.max(0, limit));
   return Promise.all(files.map(async (file) => ({ name: file.name, text: await file.text() })));

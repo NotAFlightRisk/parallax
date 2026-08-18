@@ -1,6 +1,6 @@
 <script lang="ts">
   import SourceCard from './SourceCard.svelte';
-  import { download, readFiles } from '../files';
+  import { download, readFiles, takeFiles } from '../files';
   import { zoneChoices } from '../log/zone';
   import { MAX_SOURCES, type Workspace } from '../state/workspace.svelte';
 
@@ -12,13 +12,12 @@
   let logInput = $state<HTMLInputElement | null>(null);
   let sessionInput = $state<HTMLInputElement | null>(null);
 
-  async function addFiles(files: FileList | null) {
-    if (!files) return;
+  async function addFiles(files: File[]) {
     for (const file of await readFiles(files, room)) workspace.add(file.name, file.text);
   }
 
-  async function loadSession(files: FileList | null) {
-    if (!files?.length) return;
+  async function loadSession(files: File[]) {
+    if (!files.length) return;
     try {
       workspace.loadSession(await files[0].text());
     } catch (error) {
@@ -48,7 +47,7 @@
       multiple
       accept=".log,.txt,text/*"
       hidden
-      onchange={(event) => addFiles(event.currentTarget.files)}
+      onchange={(event) => addFiles(takeFiles(event.currentTarget))}
     />
   </div>
 
@@ -71,7 +70,7 @@
         type="file"
         accept="application/json,.json"
         hidden
-        onchange={(event) => loadSession(event.currentTarget.files)}
+        onchange={(event) => loadSession(takeFiles(event.currentTarget))}
       />
     </div>
     <p class="fineprint">
