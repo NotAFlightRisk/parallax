@@ -12,6 +12,17 @@ const DENSITY_BUCKETS = 240;
 let counter = 0;
 const nextId = () => `s${(counter += 1)}`;
 
+/** First colour nobody is using, so a source that goes hands its own back */
+const freeColour = (sources: Source[]) =>
+  PALETTE.find((colour) => !sources.some((source) => source.colour === colour)) ?? PALETTE[0];
+
+/** Same idea for the name a pasted source gets when nobody titled it */
+const freeName = (sources: Source[]) => {
+  let at = 1;
+  while (sources.some((source) => source.name === `source ${at}`)) at += 1;
+  return `source ${at}`;
+};
+
 export class Workspace {
   /** Raw, because a source holds megabytes of text and typed arrays */
   sources = $state.raw<Source[]>([]);
@@ -50,14 +61,15 @@ export class Workspace {
   }
 
   add(name: string, text: string, options?: Partial<ParseOptions>) {
+    const title = name || freeName(this.sources);
     if (this.sources.length >= MAX_SOURCES) {
-      this.notice = `Six sources is the limit, so ${name} was left out`;
+      this.notice = `Six sources is the limit, so ${title} was left out`;
       return;
     }
     const source: Source = {
       id: nextId(),
-      name,
-      colour: PALETTE[this.sources.length % PALETTE.length],
+      name: title,
+      colour: freeColour(this.sources),
       text: text.includes('\r') ? text.replace(/\r/g, '') : text,
       options: { format: 'auto', zone: this.zone, ...options },
       offset: 0,
