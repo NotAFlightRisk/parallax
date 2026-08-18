@@ -54,7 +54,8 @@ function yearFrom(value: string | undefined) {
 /** Digit count tells us the unit, since nobody writes microseconds for 1970 */
 export function epochFrom(digits: string, fraction?: string) {
   const value = Number(digits);
-  const scale = digits.length <= 11 ? 1000 : digits.length <= 14 ? 1 : 0.001;
+  const { length } = digits;
+  const scale = length <= 11 ? 1000 : length <= 14 ? 1 : length <= 17 ? 0.001 : 0.000001;
   return value * scale + (fraction ? Number(`0.${fraction}`) * scale : 0);
 }
 
@@ -154,7 +155,7 @@ export const FORMATS: Record<FormatId, Format> = {
   epoch: {
     id: 'epoch',
     label: 'Epoch',
-    hint: '1755388800.123 (s, ms or µs)',
+    hint: '1755388800.123 (s, ms, µs or ns)',
     read(head) {
       const match = EPOCH.exec(head);
       return match ? { epoch: epochFrom(match[1], match[2]) } : null;
