@@ -97,6 +97,20 @@ describe('parsing', () => {
     expect(parsed.lines[0]).toBe(1);
   });
 
+  it('reads a CRLF entry without leaving carriage returns in the text', () => {
+    const text = '2026-08-17T00:00:00Z boom\r\nTraceback:\r\n\r\n  at other (b.js:2)\r\n';
+    const parsed = run(text);
+    expect(parsed.lines[0]).toBe(4);
+    expect(lineText(parsed, 0, 1)).toBe('Traceback:');
+    expect(lineText(parsed, 0, 3)).toBe('  at other (b.js:2)');
+  });
+
+  it('drops a CRLF blank line sitting between two entries', () => {
+    const parsed = run('2026-08-17T00:00:00Z up\r\n\r\n2026-08-17T00:00:01Z next\r\n');
+    expect(parsed.lines[0]).toBe(1);
+    expect(parsed.unmatched).toBe(0);
+  });
+
   it('keeps a header that arrives before the first timestamp', () => {
     const parsed = run('== boot ==\n2026-08-17T00:00:00Z up');
     expect(parsed.times).toHaveLength(1);
