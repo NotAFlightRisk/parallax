@@ -34,7 +34,7 @@ body:
     attributes:
       label: Version
       description: Which version are you on? (release tag, commit SHA, or Docker tag)
-      placeholder: v1.2.3
+      placeholder: 1.2.3
     validations:
       required: true
 

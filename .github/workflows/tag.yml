@@ -39,15 +39,14 @@ jobs:
         env:
           PART: ${{ inputs.bump || 'patch' }}
         run: |
-          latest=$(git tag --list 'v*' --sort=-v:refname | head -n1)
-          IFS=. read -r major minor patch <<< "${latest:-v0.1.0}"
-          major=${major#v}
+          latest=$(git tag --list '[0-9]*' 'v[0-9]*' | sed 's/^v//' | sort -V | tail -n1)
+          IFS=. read -r major minor patch <<< "${latest:-0.1.0}"
           case "$PART" in
             major) major=$((major + 1)); minor=0; patch=0 ;;
             minor) minor=$((minor + 1)); patch=0 ;;
             *)     patch=$((patch + 1)) ;;
           esac
-          tag="v$major.$minor.$patch"
+          tag="$major.$minor.$patch"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "feature=$([ "$PART" = patch ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
           echo "### $tag" >> "$GITHUB_STEP_SUMMARY"
