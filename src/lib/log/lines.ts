@@ -1,5 +1,12 @@
 import type { Parsed } from './types';
 
+const CR = 13;
+
+/** Trailing carriage returns come from CRLF line endings, not from the log itself */
+export function contentEnd(text: string, start: number, end: number) {
+  return end > start && text.charCodeAt(end - 1) === CR ? end - 1 : end;
+}
+
 export function entryText(parsed: Parsed, entry: number) {
   return parsed.text.slice(parsed.starts[entry], parsed.ends[entry]);
 }
@@ -14,5 +21,6 @@ export function lineText(parsed: Parsed, entry: number, line: number) {
     start = next + 1;
   }
   const next = parsed.text.indexOf('\n', start);
-  return parsed.text.slice(start, next === -1 || next > stop ? stop : next);
+  const end = next === -1 || next > stop ? stop : next;
+  return parsed.text.slice(start, contentEnd(parsed.text, start, end));
 }

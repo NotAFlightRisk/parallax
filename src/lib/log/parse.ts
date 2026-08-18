@@ -1,4 +1,5 @@
 import { NEEDS_YEAR, detect, readerFor, resolve, type Fields, type Format } from './formats';
+import { contentEnd } from './lines';
 import type { FormatId, ParseOptions, Parsed } from './types';
 import { offsetAt } from './zone';
 
@@ -11,7 +12,7 @@ const EARLY_MONTH = 2;
 
 export type ParseHooks = { onProgress?: (done: number, total: number) => void; now?: number };
 
-function lineEndAt(text: string, from: number) {
+function newlineAt(text: string, from: number) {
   const next = text.indexOf('\n', from);
   return next === -1 ? text.length : next;
 }
@@ -24,9 +25,10 @@ function sampleHeads(text: string) {
   const heads: string[] = [];
   let cursor = 0;
   while (cursor < text.length && heads.length < SAMPLE_LINES) {
-    const end = lineEndAt(text, cursor);
+    const newline = newlineAt(text, cursor);
+    const end = contentEnd(text, cursor, newline);
     if (end > cursor) heads.push(headAt(text, cursor, end));
-    cursor = end + 1;
+    cursor = newline + 1;
   }
   return heads;
 }
@@ -92,10 +94,11 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
   let nextTick = 0;
 
   while (cursor < text.length) {
-    const end = lineEndAt(text, cursor);
+    const newline = newlineAt(text, cursor);
+    const end = contentEnd(text, cursor, newline);
     if (end === cursor) {
       if (count > 0) blanks += 1;
-      cursor = end + 1;
+      cursor = newline + 1;
       continue;
     }
     total += 1;
@@ -139,7 +142,7 @@ export function parse(text: string, options: ParseOptions, hooks: ParseHooks = {
       count += 1;
     }
 
-    cursor = end + 1;
+    cursor = newline + 1;
     if (hooks.onProgress && cursor >= nextTick) {
       hooks.onProgress(cursor, text.length);
       nextTick = cursor + 1_000_000;
