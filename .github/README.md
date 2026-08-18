@@ -22,7 +22,8 @@ Fork the repo, login to any static hosting provider, and import it. Or just use 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FNotAFlightRisk%2Fparallax)
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=NotAFlightRisk/parallax)
 
-For Cloudflare it's `npm run build` then `npx wrangler deploy`, the config is already in `wrangler.jsonc`.
+For Cloudflare Workers it's `npm run build` then `npx wrangler deploy`, the config is already in
+`wrangler.jsonc`. Our own copy at [parallax.peng.ly](https://parallax.peng.ly/) deploys itself off `main`.
 
 ### Option 2: Docker
 
