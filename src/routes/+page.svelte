@@ -1,5 +1,6 @@
 <script lang="ts">
   import Density from '$lib/components/Density.svelte';
+  import Footer from '$lib/components/Footer.svelte';
   import Intake from '$lib/components/Intake.svelte';
   import LogView from '$lib/components/LogView.svelte';
   import SourceRail from '$lib/components/SourceRail.svelte';
@@ -116,15 +117,18 @@
       </div>
     </section>
   {/if}
+
+  <Footer />
 </div>
 
 <style>
   .app {
     display: grid;
-    grid-template-rows: auto 1fr;
-    height: 100dvh;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    min-height: 100dvh;
 
     &.loaded {
+      height: 100dvh;
       grid-template-columns: var(--rail) minmax(0, 1fr);
 
       .bar {
