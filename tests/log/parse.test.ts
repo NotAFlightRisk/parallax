@@ -50,6 +50,14 @@ describe('epoch units', () => {
     expect(epochFrom('1755388800123456')).toBe(1755388800123.456);
   });
 
+  it('reads nineteen digits as nanoseconds', () => {
+    expect(Math.round(epochFrom('1755388800123456789'))).toBe(1755388800123);
+  });
+
+  it('reads eighteen digits as nanoseconds, not far-future microseconds', () => {
+    expect(Math.round(epochFrom('175538880012345678'))).toBe(175538880012);
+  });
+
   it('adds a fraction in the same unit as the whole part', () => {
     expect(epochFrom('1755388800', '5')).toBe(1755388800500);
   });
@@ -64,6 +72,12 @@ describe('parsing', () => {
   it('falls back to the source zone when the line states none', () => {
     const parsed = run('2026-08-17 01:00:00 up', { format: 'iso', zone: 'Europe/London' });
     expect(parsed.times[0]).toBe(Date.UTC(2026, 7, 17, 0, 0, 0));
+  });
+
+  it('reads a Go UnixNano log as nanoseconds, not the year 57596', () => {
+    const parsed = run('1755388800123456789 boot\n1755388801123456789 ready');
+    expect(Math.round(parsed.times[0])).toBe(Date.UTC(2025, 7, 17, 0, 0, 0, 123));
+    expect(Math.round(parsed.times[1] - parsed.times[0])).toBe(1000);
   });
 
   it('attaches unparseable lines to the entry above so stack traces survive', () => {
