@@ -2,9 +2,21 @@ import { offsetAt } from './zone';
 
 const pad = (value: number, width = 2) => String(value).padStart(width, '0');
 
+/** How far towards `limit` the offset stays what it is at `time` */
+function holdsUntil(time: number, limit: number, zone: string, offset: number) {
+  if (offsetAt(limit, zone) === offset) return limit;
+  while (Math.abs(limit - time) > 1000) {
+    const middle = time + Math.trunc((limit - time) / 2);
+    if (offsetAt(middle, zone) === offset) time = middle;
+    else limit = middle;
+  }
+  return time;
+}
+
 /**
- * Caches the zone offset for a window either side of the last lookup. Calling
- * Intl once per row is fine for a screenful and far too slow for an export.
+ * Caches the zone offset for a window either side of the last lookup, stopping
+ * at a DST change. Calling Intl once per row is fine for a screenful and far
+ * too slow for an export.
  */
 export function clock(zone: string) {
   const WINDOW = 3 * 3600000;
@@ -15,8 +27,8 @@ export function clock(zone: string) {
   const offsetFor = (time: number) => {
     if (time < from || time >= to) {
       offset = offsetAt(time, zone);
-      from = time - WINDOW;
-      to = time + WINDOW;
+      from = holdsUntil(time, time - WINDOW, zone, offset);
+      to = holdsUntil(time, time + WINDOW, zone, offset) + 1;
     }
     return offset;
   };
