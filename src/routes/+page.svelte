@@ -127,12 +127,18 @@
     grid-template-rows: auto minmax(0, 1fr) auto;
     min-height: 100dvh;
 
+    /* Rail sits above the log until there is room for it alongside */
     &.loaded {
       height: 100dvh;
-      grid-template-columns: var(--rail) minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
 
-      .bar {
-        grid-column: 1 / -1;
+      @media (min-width: 60rem) {
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-columns: var(--rail) minmax(0, 1fr);
+
+        .bar {
+          grid-column: 1 / -1;
+        }
       }
     }
 
