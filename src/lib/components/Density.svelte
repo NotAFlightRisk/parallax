@@ -9,6 +9,7 @@
   let { workspace, onseek }: { workspace: Workspace; onseek: (entry: number) => void } = $props();
 
   let canvas = $state<HTMLCanvasElement | null>(null);
+  /** The plot's own width, since the strip around it is padded */
   let width = $state(800);
   let drag = $state<{ from: number; to: number } | null>(null);
 
@@ -99,10 +100,11 @@
   });
 </script>
 
-<div class="density" bind:clientWidth={width} style:--lane="{LANE}px">
+<div class="density" style:--lane="{LANE}px">
   {#if span}
     <div
       class="plot"
+      bind:clientWidth={width}
       style:height="{heightPx}px"
       onpointerdown={down}
       onpointermove={move}
