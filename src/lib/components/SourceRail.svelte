@@ -81,13 +81,23 @@
 
 <style>
   .rail {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto auto;
-    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
     min-height: 0;
-    border-inline-end: 1px solid var(--border);
+    max-height: 34dvh;
+    overflow-y: auto;
+    border-block-end: 1px solid var(--border);
     background: var(--surface-raised);
+
+    /* Beside the log it owns its full height, so only the card list scrolls */
+    @media (min-width: 60rem) {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      grid-template-columns: minmax(0, 1fr);
+      max-height: none;
+      overflow: visible;
+      border-block-end: 0;
+      border-inline-end: 1px solid var(--border);
+    }
   }
 
   header {
@@ -113,8 +123,11 @@
   }
 
   .list {
-    overflow-y: auto;
     min-height: 0;
+
+    @media (min-width: 60rem) {
+      overflow-y: auto;
+    }
   }
 
   .add {
