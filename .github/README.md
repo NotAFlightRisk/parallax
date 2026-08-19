@@ -76,7 +76,7 @@ You can also build the container with `docker build -t parallax .`
 <p  align="center">
   <a href="https://github.com/NotAFlightRisk"><img width="64" src="https://pixelflare.cc/iain/gif/penguin-dance.gif" /></a><br>
   <sup>
-    <i>Licensed under <a href="../LICENSE">MIT</a>, © <a href="https://peng.ly">NotAFlightRisk</a> 2026</i>
+    <i>Licensed under <a href="../LICENSE">MIT</a>, © <a href="https://github.com/NotAFlightRisk">NotAFlightRisk</a> 2026</i>
   </sup>
 </p>
 
