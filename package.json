@@ -23,7 +23,7 @@
     "svelte-check": "^4.6.0",
     "typescript": "^6.0.3",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   },
   "description": "Merge logs from several machines and line up their clocks",
   "license": "MIT",
