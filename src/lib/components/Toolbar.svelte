@@ -62,6 +62,7 @@
   <button
     class="chip"
     class:on={workspace.anchoring}
+    aria-pressed={workspace.anchoring}
     onclick={() => {
       workspace.anchoring = !workspace.anchoring;
       workspace.anchor = null;
@@ -74,6 +75,7 @@
   <button
     class="chip"
     class:on={workspace.showDelta}
+    aria-pressed={workspace.showDelta}
     onclick={() => (workspace.showDelta = !workspace.showDelta)}
   >
     Delta

@@ -17,6 +17,7 @@
   const stamp = $derived(clock(workspace.zone));
   const lanes = $derived(workspace.visible);
   const heightPx = $derived(Math.max(LANE, lanes.length * LANE));
+  const at = $derived(workspace.merged.times[workspace.cursor] ?? span?.[0] ?? 0);
 
   const timeAt = (x: number) =>
     span ? span[0] + (Math.min(Math.max(x, 0), width) / width) * (span[1] - span[0]) : 0;
@@ -115,7 +116,8 @@
       aria-label="Seek or zoom the time range"
       aria-valuemin={span[0]}
       aria-valuemax={span[1]}
-      aria-valuenow={workspace.merged.times[workspace.cursor] ?? span[0]}
+      aria-valuenow={at}
+      aria-valuetext={stamp.full(at)}
     >
       <canvas bind:this={canvas} style:height="{heightPx}px"></canvas>
       {#if marker}

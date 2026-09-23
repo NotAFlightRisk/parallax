@@ -47,19 +47,16 @@
   <meta name="twitter:card" content="summary" />
 </svelte:head>
 
-<div
-  class="app"
-  class:loaded={workspace.sources.length > 0}
-  class:dropping
+<svelte:body
   ondragover={(event) => {
     event.preventDefault();
     dropping = true;
   }}
   ondragleave={() => (dropping = false)}
   ondrop={drop}
-  role="application"
-  aria-label="Parallax log aligner"
->
+/>
+
+<div class="app" class:loaded={workspace.sources.length > 0} class:dropping>
   <header class="bar">
     <h1>parallax</h1>
     <p>the same event, at a different time in every log</p>
@@ -69,7 +66,7 @@
   {#if workspace.sources.length}
     <SourceRail {workspace} onpaste={() => (pasting = !pasting)} />
 
-    <main>
+    <main class="workspace">
       <Toolbar {workspace} />
       {#if pasting}
         <div class="paste">
@@ -98,7 +95,7 @@
       </footer>
     </main>
   {:else}
-    <section class="hero">
+    <main class="hero">
       <div class="pitch">
         <p>
           Two machines, two clocks, one incident. Drop the logs in, nudge the ones whose clock
@@ -115,7 +112,7 @@
         <Intake {workspace} rows={9} />
         <p class="drophint">or drop up to six files anywhere on this page</p>
       </div>
-    </section>
+    </main>
   {/if}
 
   <Footer />
@@ -183,7 +180,7 @@
     }
   }
 
-  main {
+  .workspace {
     display: flex;
     flex-direction: column;
     min-width: 0;
