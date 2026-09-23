@@ -9,7 +9,7 @@
   import { readFiles } from '$lib/files';
   import { clock } from '$lib/log/time';
   import { Workspace } from '$lib/state/workspace.svelte';
-  import { description, title } from '$lib/meta';
+  import { description, site, title } from '$lib/meta';
 
   const workspace = new Workspace();
 
@@ -38,12 +38,14 @@
 <svelte:head>
   <title>{title}</title>
   <meta name="description" content={description} />
-  <link rel="canonical" href="https://parallax.peng.ly/" />
+  <link rel="canonical" href="{site}/" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://parallax.peng.ly/" />
-  <meta name="twitter:card" content="summary" />
+  <meta property="og:url" content="{site}/" />
+  <meta property="og:image" content="{site}/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="{site}/og.png" />
 </svelte:head>
 
 <svelte:body
