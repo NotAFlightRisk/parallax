@@ -3,7 +3,7 @@ import { density, merge, sourceOf, spanOf, type Lane } from '../log/merge';
 import { matchMask } from '../log/search';
 import { fromSession, toSession } from '../log/session';
 import { localZone } from '../log/zone';
-import type { ParseOptions, Source, WorkerRequest, WorkerResponse } from '../log/types';
+import type { Parsed, ParseOptions, Source, WorkerRequest, WorkerResponse } from '../log/types';
 
 export const PALETTE = ['#7aa2f7', '#9ece6a', '#e0af68', '#f7768e', '#bb9af7', '#7dcfff'];
 export const MAX_SOURCES = PALETTE.length;
@@ -39,14 +39,15 @@ export class Workspace {
   private runs = new Map<string, { run: number; worker: Worker }>();
   private counter = 0;
 
+  /** A mask costs a pass over the whole source, and dragging an offset redoes `lanes` every frame */
+  private masks = new WeakMap<Parsed, { needle: string; mask: Uint8Array }>();
+
   lanes: Lane[] = $derived.by(() => {
     const needle = this.query.trim().toLowerCase();
     return this.visible.map((source) => ({
       parsed: source.parsed!,
       offset: source.offset,
-      mask: needle
-        ? matchMask(source.text, needle, source.parsed!.starts, source.parsed!.ends)
-        : undefined
+      mask: needle ? this.maskFor(source.parsed!, needle) : undefined
     }));
   });
 
@@ -55,6 +56,14 @@ export class Workspace {
   /** The whole span, ignoring filters, so zooming out again is always possible */
   span = $derived(spanOf(this.lanes));
   bands = $derived(this.span ? density(this.lanes, this.span, DENSITY_BUCKETS) : []);
+
+  private maskFor(parsed: Parsed, needle: string) {
+    const cached = this.masks.get(parsed);
+    if (cached?.needle === needle) return cached.mask;
+    const mask = matchMask(parsed.text, needle, parsed.starts, parsed.ends);
+    this.masks.set(parsed, { needle, mask });
+    return mask;
+  }
 
   sourceAt(row: number) {
     return this.visible[sourceOf(this.merged.order[row])];
