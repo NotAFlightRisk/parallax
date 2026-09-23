@@ -8,7 +8,7 @@
   import { DEMO } from '$lib/demo';
   import { readFiles } from '$lib/files';
   import { clock } from '$lib/log/time';
-  import { MAX_SOURCES, Workspace } from '$lib/state/workspace.svelte';
+  import { Workspace } from '$lib/state/workspace.svelte';
   import { description, title } from '$lib/meta';
 
   const workspace = new Workspace();
@@ -19,14 +19,13 @@
 
   const stamp = $derived(clock(workspace.zone));
   const span = $derived(workspace.span);
-  const room = $derived(MAX_SOURCES - workspace.sources.length);
 
   async function drop(event: DragEvent) {
     event.preventDefault();
     dropping = false;
     const files = event.dataTransfer?.files;
     if (!files) return;
-    for (const file of await readFiles(files, room)) workspace.add(file.name, file.text);
+    for (const file of await readFiles(files)) workspace.add(file.name, file.text);
   }
 
   function loadDemo() {

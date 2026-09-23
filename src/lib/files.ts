@@ -5,9 +5,10 @@ export function takeFiles(input: HTMLInputElement) {
   return files;
 }
 
-export async function readFiles(list: FileList | File[], limit: number) {
-  const files = Array.from(list).slice(0, Math.max(0, limit));
-  return Promise.all(files.map(async (file) => ({ name: file.name, text: await file.text() })));
+export async function readFiles(list: FileList | File[]) {
+  return Promise.all(
+    Array.from(list).map(async (file) => ({ name: file.name, text: await file.text() }))
+  );
 }
 
 export function download(name: string, text: string, type = 'text/plain;charset=utf-8') {

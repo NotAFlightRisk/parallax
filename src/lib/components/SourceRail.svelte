@@ -13,7 +13,7 @@
   let sessionInput = $state<HTMLInputElement | null>(null);
 
   async function addFiles(files: File[]) {
-    for (const file of await readFiles(files, room)) workspace.add(file.name, file.text);
+    for (const file of await readFiles(files)) workspace.add(file.name, file.text);
   }
 
   async function loadSession(files: File[]) {
