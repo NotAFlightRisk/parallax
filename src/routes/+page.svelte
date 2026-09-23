@@ -230,6 +230,14 @@
       font-family: var(--font-mono);
     }
 
+    .keys {
+      display: none;
+
+      @media (min-width: 60rem) {
+        display: inline;
+      }
+    }
+
     kbd {
       padding: 1px 4px;
       border: 1px solid var(--border-strong);
