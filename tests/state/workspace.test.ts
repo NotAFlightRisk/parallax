@@ -1,5 +1,6 @@
 import { expect, it, vi } from 'vitest';
 import { MAX_SOURCES, Workspace } from '../../src/lib/state/workspace.svelte';
+import { parse } from '../../src/lib/log/parse';
 
 /** Nothing here waits on a parse, so the worker only has to exist */
 class Idle {
@@ -42,4 +43,37 @@ it('numbers an untitled source from the first spare', () => {
   workspace.remove(workspace.sources[1].id);
   workspace.add('', '');
   expect(field(workspace, 'name').at(-1)).toBe('source 2');
+});
+
+const LOG = [
+  '2026-08-17T00:00:01Z boot',
+  '2026-08-17T00:00:02Z start',
+  '2026-08-17T00:00:03Z boot'
+].join('\n');
+
+const parsedLog = () => parse(LOG, { format: 'auto', zone: 'UTC' });
+
+const loaded = () => {
+  const workspace = new Workspace();
+  workspace.add('log', LOG);
+  workspace.update(workspace.sources[0].id, { parsed: parsedLog() });
+  return workspace;
+};
+
+it('reuses the filter mask while only an offset moves', () => {
+  const workspace = loaded();
+  workspace.query = 'boot';
+  const mask = workspace.lanes[0].mask;
+  workspace.update(workspace.sources[0].id, { offset: 250 });
+  expect(workspace.lanes[0].mask).toBe(mask);
+  workspace.query = 'start';
+  expect(workspace.lanes[0].mask).not.toBe(mask);
+});
+
+it('drops the mask when the source is parsed again', () => {
+  const workspace = loaded();
+  workspace.query = 'boot';
+  const mask = workspace.lanes[0].mask;
+  workspace.update(workspace.sources[0].id, { parsed: parsedLog() });
+  expect(workspace.lanes[0].mask).not.toBe(mask);
 });
