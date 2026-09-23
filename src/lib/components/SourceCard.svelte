@@ -15,6 +15,9 @@
 
   const percent = (value: number) => `${Math.round(value * 100)}%`;
   const nudge = perFrame((offset: number) => workspace.update(source.id, { offset }));
+  const exact = (offset: number) => {
+    if (Number.isFinite(offset)) nudge(offset);
+  };
 </script>
 
 <article class="source" class:off={!source.enabled} style:--tint={source.colour}>
@@ -116,7 +119,7 @@
         step="1"
         value={source.offset}
         aria-label="Offset for {source.name} in milliseconds, exact"
-        oninput={(event) => nudge(Number(event.currentTarget.value) || 0)}
+        oninput={(event) => exact(event.currentTarget.valueAsNumber)}
       />
       <span>ms</span>
       <button

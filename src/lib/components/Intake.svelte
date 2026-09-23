@@ -11,7 +11,7 @@
   let name = $state('');
 
   function take(raw: string) {
-    workspace.add(name.trim(), raw.replace(/\r/g, ''));
+    workspace.add(name.trim(), raw);
     text = '';
     name = '';
     ondone?.();
