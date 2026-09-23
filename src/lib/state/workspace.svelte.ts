@@ -37,7 +37,7 @@ export class Workspace {
 
   /** Live parse per source, so a superseded run cannot land after the one that replaced it */
   private runs = new Map<string, { run: number; worker: Worker }>();
-  private counter = 0;
+  private runCount = 0;
 
   /** A mask costs a pass over the whole source, and dragging an offset redoes `lanes` every frame */
   private masks = new WeakMap<Parsed, { needle: string; mask: Uint8Array }>();
@@ -116,7 +116,7 @@ export class Workspace {
     this.runs.get(id)?.worker.terminate();
     this.update(id, { progress: 0, error: undefined });
 
-    const run = (this.counter += 1);
+    const run = (this.runCount += 1);
     const worker = new Worker(new URL('../log/worker.ts', import.meta.url), { type: 'module' });
     this.runs.set(id, { run, worker });
     const current = () => this.runs.get(id)?.run === run;
