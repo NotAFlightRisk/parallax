@@ -1,15 +1,15 @@
 <script lang="ts">
-  import Density from '$lib/components/Density.svelte';
-  import Footer from '$lib/components/Footer.svelte';
-  import Intake from '$lib/components/Intake.svelte';
-  import LogView from '$lib/components/LogView.svelte';
-  import SourceRail from '$lib/components/SourceRail.svelte';
-  import Toolbar from '$lib/components/Toolbar.svelte';
-  import { DEMO } from '$lib/demo';
-  import { readFiles } from '$lib/files';
-  import { clock } from '$lib/log/time';
-  import { Workspace } from '$lib/state/workspace.svelte';
-  import { description, site, title } from '$lib/meta';
+  import Density from '#lib/components/Density.svelte';
+  import Footer from '#lib/components/Footer.svelte';
+  import Intake from '#lib/components/Intake.svelte';
+  import LogView from '#lib/components/LogView.svelte';
+  import SourceRail from '#lib/components/SourceRail.svelte';
+  import Toolbar from '#lib/components/Toolbar.svelte';
+  import { DEMO } from '#lib/demo.js';
+  import { readFiles } from '#lib/files.js';
+  import { clock } from '#lib/log/time.js';
+  import { Workspace } from '#lib/state/workspace.svelte.js';
+  import { description, site, title } from '#lib/meta.js';
 
   const workspace = new Workspace();
 
