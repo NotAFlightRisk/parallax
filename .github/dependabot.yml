@@ -37,6 +37,10 @@ updates:
           - 'svelte'
           - '@sveltejs/*'
           - 'vite'
+      # The SDK and its build plugin, so a major bump moves them together
+      sentry:
+        patterns:
+          - '@sentry/*'
 
   - package-ecosystem: 'docker'
     directory: '/'
