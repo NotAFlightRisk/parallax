@@ -5,6 +5,9 @@
   type Panel = (typeof PANELS)[number];
 
   const year = new Date().getFullYear();
+  const tracked = Boolean(
+    import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT || import.meta.env.PUBLIC_SENTRY_DSN
+  );
 
   let panel = $state<Panel | null>(null);
   let sheet = $state<HTMLDialogElement | null>(null);
@@ -49,10 +52,14 @@
       There's nothing to collect. Your logs are read here in this tab, by your own browser, and they
       never go anywhere near a server of ours.
     </p>
-    <p>
-      No cookies, no accounts, no analytics, nothing saved between visits. Close the tab and it's
-      gone.
-    </p>
+    <p>No cookies, no accounts, nothing saved between visits. Close the tab and it's gone.</p>
+    {#if tracked}
+      <p>
+        This site counts visits with Plausible, which is anonymous and doesn't use cookies. If
+        something crashes, it sends us the error so we can fix it, with any bits of your logs
+        blanked out first.
+      </p>
+    {/if}
   {:else if panel === 'Terms'}
     <p>
       Free to use for anything, work included, under the <a href="{REPO}/blob/main/LICENSE"
