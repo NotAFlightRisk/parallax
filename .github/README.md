@@ -42,10 +42,6 @@ Grab `site.zip` off the [latest release](https://github.com/NotAFlightRisk/paral
 
 Follow the [Development](#development) steps, then run `npm run build`, and then serve up the `build/` directory.
 
-### Analytics
-
-There aren't any, unless you build with `PUBLIC_PLAUSIBLE_SCRIPT` set to your [Plausible](https://plausible.io/) site's script URL (for Docker, pass it as a `--build-arg`). Our copy reports to our Plausible, your fork won't.
-
 ---
 
 ## Development
