@@ -7,7 +7,7 @@ const plausible = process.env.PUBLIC_PLAUSIBLE_SCRIPT ?? '';
 const pulse = plausible ? [new URL(plausible).origin as `${string}.${string}`] : [];
 const sentry = process.env.PUBLIC_SENTRY_DSN ?? '';
 const oops = sentry ? [new URL(sentry).origin as `${string}.${string}`] : [];
-const uploadMaps = Boolean(process.env.SENTRY_AUTH_TOKEN);
+const uploadMaps = Boolean(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_URL);
 
 export default defineConfig({
   define: {
@@ -41,7 +41,7 @@ export default defineConfig({
     uploadMaps &&
       sentryVitePlugin({
         telemetry: false,
-        release: { create: false, finalize: false },
+        release: { create: false, finalize: false, setCommits: false, deploy: false },
         bundleSizeOptimizations: { excludeDebugStatements: true, excludeTracing: true },
         sourcemaps: {
           assets: '.svelte-kit/output/client/**',

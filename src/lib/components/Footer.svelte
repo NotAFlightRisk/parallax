@@ -5,9 +5,8 @@
   type Panel = (typeof PANELS)[number];
 
   const year = new Date().getFullYear();
-  const tracked = Boolean(
-    import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT || import.meta.env.PUBLIC_SENTRY_DSN
-  );
+  const analytics = Boolean(import.meta.env.PUBLIC_PLAUSIBLE_SCRIPT);
+  const reporting = Boolean(import.meta.env.PUBLIC_SENTRY_DSN);
 
   let panel = $state<Panel | null>(null);
   let sheet = $state<HTMLDialogElement | null>(null);
@@ -53,10 +52,12 @@
       never go anywhere near a server of ours.
     </p>
     <p>No cookies, no accounts, nothing saved between visits. Close the tab and it's gone.</p>
-    {#if tracked}
+    {#if analytics}
+      <p>This site counts visits with Plausible, which is anonymous and doesn't use cookies.</p>
+    {/if}
+    {#if reporting}
       <p>
-        This site counts visits with Plausible, which is anonymous and doesn't use cookies. If
-        something crashes, it sends us the error so we can fix it, with any bits of your logs
+        If something crashes, it sends us the error so we can fix it, with any bits of your logs
         blanked out first.
       </p>
     {/if}
