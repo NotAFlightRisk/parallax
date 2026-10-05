@@ -1,4 +1,4 @@
-import { browser } from '$app/environment';
+import { browser } from '$app/env';
 import { density, merge, sourceOf, spanOf, type Lane } from '../log/merge';
 import { matchMask } from '../log/search';
 import { fromSession, toSession } from '../log/session';
