@@ -14,19 +14,19 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@sentry/browser": "^11.6.0",
+    "@sentry/browser": "^11.8.0",
     "@sentry/vite-plugin": "^5.4.1",
     "@sveltejs/adapter-static": "^4.0.0",
-    "@sveltejs/kit": "^3.0.1",
+    "@sveltejs/kit": "^3.1.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/node": "^26.6.5",
     "prettier": "^3.9.10",
     "prettier-plugin-svelte": "^4.1.1",
     "svelte": "^5.57.2",
-    "svelte-check": "^4.7.5",
+    "svelte-check": "^4.7.7",
     "typescript": "^6.0.3",
     "vite": "^8.3.4",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.5"
   },
   "description": "Merge logs from several machines and line up their clocks",
   "license": "MIT",
