@@ -89,10 +89,10 @@
         {#if span}
           <span class="range">{stamp.full(span[0])} → {stamp.full(span[1])}</span>
         {/if}
-        <span class="keys"
-          ><kbd>j</kbd><kbd>k</kbd> line · <kbd>n</kbd><kbd>p</kbd> same source ·
-          <kbd>/</kbd> filter</span
-        >
+        <span class="keys">
+          <kbd>j</kbd><kbd>k</kbd> line · <kbd>n</kbd><kbd>p</kbd> same source ·
+          <kbd>/</kbd> filter
+        </span>
       </footer>
     </main>
   {:else}

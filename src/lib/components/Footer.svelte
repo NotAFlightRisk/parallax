@@ -63,9 +63,9 @@
     {/if}
   {:else if panel === 'Terms'}
     <p>
-      Free to use for anything, work included, under the <a href="{REPO}/blob/main/LICENSE"
-        >MIT licence</a
-      >.
+      Free to use for anything, work included, under the <a href="{REPO}/blob/main/LICENSE">
+        MIT licence
+      </a>.
     </p>
     <p>
       It comes with no warranty though. If a timestamp comes out wrong or a line lands in the wrong
