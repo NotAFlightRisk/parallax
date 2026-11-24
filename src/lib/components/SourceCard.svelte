@@ -49,8 +49,9 @@
   {:else if parsed}
     <p class="state">
       {parsed.times.length.toLocaleString()} entries
-      {#if parsed.unmatched}<span class="warn">· {parsed.unmatched.toLocaleString()} attached</span
-        >{/if}
+      {#if parsed.unmatched}<span class="warn">
+          · {parsed.unmatched.toLocaleString()} attached
+        </span>{/if}
       {#if parsed.detected}<span class="auto">· detected</span>{/if}
     </p>
   {/if}
@@ -125,8 +126,10 @@
       <button
         class="link"
         disabled={source.offset === 0}
-        onclick={() => workspace.update(source.id, { offset: 0 })}>reset</button
+        onclick={() => workspace.update(source.id, { offset: 0 })}
       >
+        reset
+      </button>
     </div>
   </div>
 
